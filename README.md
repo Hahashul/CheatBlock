@@ -53,9 +53,14 @@ An online exam platform with **browser-based proctoring**. Students take timed m
 
 ## Live Demo
 
-**Try it without installing:** LIVE_DEMO_URL_HERE
+**Try it without installing:** https://cheatblock-exam.onrender.com
 
-Sign in with the live demo accounts in the table under [Demo accounts](#demo-accounts) (`student@cheatblock.local` / `student1234`, or `admin@cheatblock.local` / `admin1234`). The camera needs HTTPS and your permission. The demo data resets when the server restarts.
+| Role | Email | Password |
+|---|---|---|
+| Student | `student@cheatblock.local` | `student1234` |
+| Admin | `admin@cheatblock.local` | `admin1234` |
+
+> The camera needs HTTPS and your permission. Demo data resets when the server restarts.
 
 ## Getting Started
 
