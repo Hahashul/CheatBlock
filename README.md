@@ -1,64 +1,74 @@
 # CheatBlock
 
-An online exam platform with browser-based proctoring. Students take timed multiple-choice exams while the browser watches for signs of cheating. Admins create exams and questions, and review scores and warning logs.
+![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)
+![Node](https://img.shields.io/badge/node-%E2%89%A524-339933?logo=node.js&logoColor=white)
+![React](https://img.shields.io/badge/react-18-61DAFB?logo=react&logoColor=black)
+![SQLite](https://img.shields.io/badge/database-SQLite-003B57?logo=sqlite&logoColor=white)
 
-**Live demo:** https://online-examination-and-evaluation.onrender.com/
-The demo runs on a free plan. It can take about a minute to wake up, and its data resets after a restart.
+An online exam platform with **browser-based proctoring**. Students take timed multiple-choice exams while the browser watches for signs of cheating. Admins create exams and review scores and warning logs.
 
-## What it does
+## Screenshots
 
-**For students**
+![Landing page](docs/landing.png)
+
+| Student dashboard | Admin dashboard |
+|---|---|
+| ![Student dashboard](docs/student-dashboard.png) | ![Admin dashboard](docs/admin-dashboard.png) |
+
+## Features
+
+### Students
 - Sign in, see available exams, and take each exam once.
-- A pre-exam check confirms the camera works and shows the rules.
-- During the exam: a timer that cannot be stalled by slowing the browser, a question navigator, flagging, and a live warning log.
-- The score comes from the server, never from the browser.
+- Pre-exam check: camera test and exam rules.
+- Server-driven timer that can't be stalled by slowing the browser.
+- Question navigator, flag-for-review, and a live warning log.
+- Score is calculated on the server, never in the browser.
+- Results page with analytics charts.
 
-**Proctoring (in the browser)**
-- Face check with MediaPipe: no face, or more than one face, for 4 seconds is logged.
-- Tab switch, window blur, leaving fullscreen and camera loss are logged.
-- Copy, cut, paste, right-click and common shortcuts are blocked (blocked, not counted).
-- Five warnings submit the exam automatically.
-- Only the timestamped log is stored. Camera images are never saved.
+### Proctoring (runs in the browser)
+- **Face check** with MediaPipe: no face, or more than one face, for 4 seconds is logged.
+- Logs tab switch, window blur, leaving fullscreen, and camera loss.
+- Blocks copy, cut, paste, right-click, and common shortcuts.
+- **5 warnings auto-submit** the exam.
+- Only a timestamped log is stored. **Camera images are never saved.**
 
-**For admins**
-- Create and delete exams, and add, edit and delete questions.
-- See every attempt with its score and warning count, and open the warning log for each one.
+### Admins
+- Create and delete exams; add, edit, and delete questions.
+- View every attempt with its score and warning count.
+- Open the full warning log for each attempt.
 
-**Server rules**
+### Server rules
 - One attempt per student per exam.
-- An exam with a scheduled time cannot be started before it.
-- A submit that arrives more than 60 seconds after the time limit is saved with a score of 0.
+- Scheduled exams can't be started early.
+- A submit arriving more than 60 seconds after the time limit scores 0.
 
-## Honest limits
+## Tech Stack
 
-Browser proctoring is a deterrent and an evidence log, not a guarantee.
+| Layer | Tools |
+|---|---|
+| Client | React 18, Vite, TypeScript, Tailwind CSS 4, shadcn/ui (Radix), Recharts |
+| Proctoring | `@mediapipe/tasks-vision` |
+| Server | Node 24, Express 5, SQLite (`node:sqlite`) |
+| Auth | scrypt password hashes, HMAC-signed HTTP-only session cookie (8 hours) |
 
-- It can be bypassed: a second device, a virtual camera, developer tools, or a person off camera.
-- A web page cannot block `Alt+Tab`, `Ctrl+T`, `Ctrl+W`, or opening developer tools from the browser menu.
-- Face detection can give false alarms (poor light, leaving the frame) and can miss things.
-- The warning log is evidence for a person to review. It is not proof of cheating.
-- Warnings are sent by the browser, so the server trusts them as sent.
+## Live Demo
 
-## Tech
+**Try it without installing:** LIVE_DEMO_URL_HERE
 
-- **Client:** React 18, Vite, Tailwind CSS 4, shadcn/ui (Radix), recharts, `@mediapipe/tasks-vision`
-- **Server:** Node 24, Express, SQLite through the built-in `node:sqlite`
-- **Auth:** scrypt password hashes and an HMAC-signed HTTP-only session cookie (8 hours)
+Sign in with the live demo accounts in the table under [Demo accounts](#demo-accounts) (`student@cheatblock.local` / `student1234`, or `admin@cheatblock.local` / `admin1234`). The camera needs HTTPS and your permission. The demo data resets when the server restarts.
 
-Node **24 or newer** is required (`node:sqlite` and `--env-file`).
+## Getting Started
 
-## Run it locally
+**Requirements:** Node **24 or newer**, and [pnpm](https://pnpm.io/).
 
-You need two terminals.
-
-```
-git clone <your-repo-url>
-cd <repo-folder>
+```bash
+git clone https://github.com/Hahashul/CheatBlock.git
+cd CheatBlock
 ```
 
-**Server** (`server/`):
+### 1. Server
 
-```
+```bash
 cd server
 pnpm install
 ```
@@ -70,61 +80,61 @@ PORT=3001
 SESSION_SECRET=<a long random string>
 ```
 
-Generate a secret with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. Then:
+Generate a secret:
 
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
+
+Start it:
+
+```bash
 pnpm dev
 ```
 
-The database file `cheatblock.db` is created on first run and filled with demo data if it is empty.
+The database `cheatblock.db` is created on first run and filled with demo data.
 
-**Client** (`client/`):
+### 2. Client (in a second terminal)
 
-```
+```bash
 cd client
 pnpm install
 pnpm dev
 ```
 
-Open http://localhost:5173/. The Vite dev server proxies `/api` to port 3001.
+Open http://localhost:5173. The Vite dev server proxies `/api` to port 3001.
 
-**Demo accounts (local only):**
+### Demo accounts
 
-| Role | Email | Password |
-|---|---|---|
-| Admin | `admin@cheatblock.local` | `admin123` |
-| Student | `student@cheatblock.local` | `student123` |
+| Role | Email | Password (local) | Password (live demo) |
+|---|---|---|---|
+| Admin | `admin@cheatblock.local` | `admin123` | `admin1234` |
+| Student | `student@cheatblock.local` | `student123` | `student1234` |
 
-To reset the data: stop the server, delete `server/cheatblock.db`, and start it again.
+To reset data: stop the server, delete `server/cheatblock.db`, start again.
 
-Run every `pnpm` command inside `client/` or `server/`, never in the repo root.
+> Run every `pnpm` command inside `client/` or `server/`, never in the repo root.
 
-## Environment variables (server)
+## Environment Variables (server)
 
 | Variable | Purpose |
 |---|---|
-| `PORT` | Port to listen on (default 3001) |
-| `SESSION_SECRET` | Secret for signing session cookies. Required. |
-| `DATABASE_PATH` | Database file (default `cheatblock.db`, relative to where the server runs) |
+| `PORT` | Port to listen on (default `3001`) |
+| `SESSION_SECRET` | Secret for signing cookies. **Required.** |
+| `DATABASE_PATH` | Database file (default `cheatblock.db`) |
 | `NODE_ENV` | Set to `production` to make cookies `secure` |
-| `ADMIN_PASSWORD`, `STUDENT_PASSWORD` | Passwords for the demo accounts. **Required in production**; locally they default to the simple passwords above. |
+| `ADMIN_PASSWORD`, `STUDENT_PASSWORD` | Demo account passwords. **Required in production.** |
 
-## Deploy
+## Deployment
 
 The server also serves the built client, so one service is enough (one URL, no CORS).
 
-- **Build command:** `npm install -g pnpm && cd client && pnpm install && pnpm build && cd ../server && pnpm install`
-- **Start command:** `cd server && node src/index.js`
+- **Build:** `npm install -g pnpm && cd client && pnpm install && pnpm build && cd ../server && pnpm install`
+- **Start:** `cd server && node src/index.js`
 - **Environment:** `NODE_VERSION=24`, `NODE_ENV=production`, `SESSION_SECRET`, `ADMIN_PASSWORD`, `STUDENT_PASSWORD`
-- The site must be served over **HTTPS** for the camera to work. Hosts do this by default.
+- Must be served over **HTTPS** for the camera to work.
 
-SQLite is a file. On hosts with a temporary disk (such as free plans), data is lost on restart, and the demo data is created again. For real use, attach a persistent disk and set `DATABASE_PATH` to a path on it.
-
-## Notes
-
-- **Face model:** the small face detection model loads from a Google Storage URL when an exam starts, so students need an internet connection. To work offline, download the `.tflite` file into `client/public/` and point `modelAssetPath` in `ExamInterface.tsx` at it.
-- **WASM files:** the MediaPipe engine files live in `client/public/mediapipe/wasm/`. After upgrading `@mediapipe/tasks-vision`, copy them again from `node_modules/@mediapipe/tasks-vision/wasm`.
-- **Warning limit:** `VIOLATION_LIMIT` is a constant at the top of `client/src/app/components/ExamInterface.tsx`.
+SQLite is a file. On hosts with a temporary disk (e.g. free plans), data resets on restart. For real use, attach a persistent disk and set `DATABASE_PATH`.
 
 ## API
 
@@ -133,53 +143,71 @@ All routes are under `/api`.
 | Method | Endpoint | Access | Notes |
 |---|---|---|---|
 | GET | `/health` | public | Server check |
-| POST | `/auth/login` | public | `{ email, password }`, sets the cookie |
-| POST | `/auth/logout` | public | Clears the cookie |
+| POST | `/auth/login` | public | `{ email, password }`, sets cookie |
+| POST | `/auth/logout` | public | Clears cookie |
 | GET | `/auth/me` | signed in | Current user |
 | GET | `/exams` | signed in | List with question counts |
-| GET | `/exams/:id` | signed in | Exam and questions, without correct answers |
-| GET | `/completed-exams` | student | Ids of exams already submitted |
-| POST | `/attempts` | student | `{ examId }`. Starts or resumes an attempt. Refused after a submit, or before the scheduled time. |
+| GET | `/exams/:id` | signed in | Exam and questions, without answers |
+| GET | `/completed-exams` | student | Ids of submitted exams |
+| POST | `/attempts` | student | `{ examId }`. Starts or resumes an attempt |
 | POST | `/attempts/:id/violations` | student | `{ type, detail }` |
-| POST | `/attempts/:id/submit` | student | `{ answers }`. Scored on the server. |
+| POST | `/attempts/:id/submit` | student | `{ answers }`. Scored on the server |
 | GET | `/results` | signed in | The caller's finished attempts |
-| POST, PUT, DELETE | `/admin/exams`, `/admin/exams/:id` | admin | Manage exams. Delete is refused if the exam has attempts. |
-| GET, POST | `/admin/exams/:id/questions` | admin | Questions (with correct answers) |
+| POST, PUT, DELETE | `/admin/exams`, `/admin/exams/:id` | admin | Manage exams |
+| GET, POST | `/admin/exams/:id/questions` | admin | Questions (with answers) |
 | PUT, DELETE | `/admin/questions/:id` | admin | Manage a question |
 | GET | `/admin/attempts` | admin | All attempts |
 | GET | `/admin/attempts/:id/violations` | admin | Warning log for one attempt |
 
 Violation types: `tab_switch`, `window_blur`, `fullscreen_exit`, `camera_lost`, `no_face`, `multiple_faces`.
 
-## Project layout
+## Project Structure
 
 ```
-client/   React app (Vite)
-  src/app/components/   pages: Landing, Login, StudentDashboard, PreExamCheck,
-                        ExamInterface, ResultsAnalytics, AdminDashboard
-  src/app/api.ts        fetch helper
-  src/app/auth.tsx      sign-in state
-server/   Express API
-  src/index.js          app, login, serves the client
-  src/exams.js          exams, attempts, violations, submit
-  src/admin.js          results and admin routes
-  src/auth.js           passwords, sessions, role checks
-  src/db.js             SQLite schema
-  src/seed.js           demo data
+client/                     React app (Vite)
+  src/app/components/       Landing, Login, StudentDashboard, PreExamCheck,
+                            ExamInterface, ResultsAnalytics, AdminDashboard
+  src/app/api.ts            fetch helper
+  src/app/auth.tsx          sign-in state
+server/                     Express API
+  src/index.js              app, login, serves the client
+  src/exams.js              exams, attempts, violations, submit
+  src/admin.js              results and admin routes
+  src/auth.js               passwords, sessions, role checks
+  src/db.js                 SQLite schema
+  src/seed.js               demo data
 ```
 
-## Known gaps
+## Limitations
 
-- No rate limiting on login.
-- Sessions are stateless: signing out clears the cookie, but a stolen token stays valid until it expires.
-- Violations are reported by the browser, so a determined user can suppress them.
+Browser proctoring is a **deterrent and evidence log, not a guarantee**.
 
-## Authors
+- It can be bypassed (second device, virtual camera, developer tools, person off camera).
+- A web page can't block `Alt+Tab`, `Ctrl+T`, `Ctrl+W`, or the browser menu.
+- Face detection can give false alarms (poor light, leaving the frame) and can miss things.
+- The warning log is for human review. It is not proof of cheating.
+- Warnings are sent by the browser, so the server trusts them as sent.
 
-Moulik Gupta and Shubh Verma.
+## Roadmap
 
-## Credits and license
+- [ ] Rate limiting on login
+- [ ] Server-side session revocation
+- [ ] Automated tests
+- [ ] Bundle the face model for offline use
+- [ ] CSV export of results
 
-The interface started from a frontend-only export from Figma Make. See `ATTRIBUTIONS.md` for the third-party components and assets used.
+## Notes
 
-No license has been chosen yet.
+- **Face model:** loads from a Google Storage URL when an exam starts, so students need internet. For offline use, download the `.tflite` file into `client/public/` and update `modelAssetPath` in `ExamInterface.tsx`.
+- **WASM files:** MediaPipe engine files live in `client/public/mediapipe/wasm/`. After upgrading `@mediapipe/tasks-vision`, copy them again from `node_modules/@mediapipe/tasks-vision/wasm`.
+- **Warning limit:** change `VIOLATION_LIMIT` at the top of `ExamInterface.tsx`.
+
+## Author
+
+**Harshul Adwani** — [GitHub](https://github.com/Hahashul)
+
+## License
+
+Released under the [MIT License](LICENSE).
+
+The interface started from a frontend-only Figma Make export. See [ATTRIBUTIONS.md](ATTRIBUTIONS.md) for third-party components and assets.
