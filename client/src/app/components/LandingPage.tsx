@@ -109,7 +109,7 @@ export function LandingPage() {
       </main>
 
       <footer className="border-t border-white/10 px-8 lg:px-12 py-8 text-center text-sm text-neutral-500">
-        CheatBlock. Built by Moulik Gupta and Shubh Verma.
+        CheatBlock. Built by Harshul Adwani.
       </footer>
     </div>
   );
